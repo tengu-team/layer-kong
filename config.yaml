@@ -1,0 +1,16 @@
+options:
+  proxy_port:
+    type: int
+    default: 8000
+    description: |
+        port on which Kong will accept HTTP requests. This is the 
+        public-facing entrypoint of Kong, to which your consumers 
+        will make requests.
+  admin_port:
+    type: int
+    default: 8001
+    description: |
+        port on which Kong will expose an entrypoint to the Admin 
+        API. This API lets you configure and manage Kong, and 
+        should be kept private and secured.
+

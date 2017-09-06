@@ -1,0 +1,10 @@
+[Unit]
+Description= Kong will be launched as a service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/kong start
+ExecStop=/usr/local/bin/kong stop
+
+[Install]
+WantedBy=multi-user.target

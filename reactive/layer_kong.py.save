@@ -1,0 +1,25 @@
+from charmhelpers.core.hookenv import status_set, log, config, open_port
+from charms.reactive import when, when_not, set_state, remove_state
+
+@hook('cassandra.available')
+def cassandra_removed():
+    remove_state('kong.installed')
+    status_set('blocked', 'Waiting for a connection with Cassandra.')
+
+@when('apt.installed.kong', 'cassandra.available')
+@when_not('kong.installed')
+def install_layer_kong(cassandra):
+    # Do your setup here.
+    #
+    # If your charm has other dependencies before it can install,
+    # add those as @when() clauses above., or as additional @when()
+    # decorated handlers below
+    #
+    # See the following for information about reactive charms:
+    #
+    #  * https://jujucharms.com/docs/devel/developer-getting-started
+    #  * https://github.com/juju-solutions/layer-basic#overview
+    #
+    print(cassandra.__dict__)
+    set_state('kong.installed')
+    status_set('active', 'Kong installed and running.')

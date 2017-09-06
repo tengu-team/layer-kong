@@ -1,0 +1,20 @@
+name: kong
+summary: Secure, manage and extend your APIs and Microservices
+maintainer: Gregory Van Seghbroeck <gregory.vanseghbroeck@tengu.io>
+description: |
+  The open-source API Gateway and Microservices Management Layer, 
+  delivering high performance and reliability.
+tags:
+  # Replace "misc" with one or more whitelisted tags from this list:
+  # https://jujucharms.com/docs/stable/authors-charm-metadata
+  - security
+  - application_development
+subordinate: false
+provides:
+  admin-api:
+    interface: http
+  proxy-endpoint:
+    interface: http
+requires:
+  cassandra:
+    interface: cassandra
