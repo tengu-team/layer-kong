@@ -1,5 +1,5 @@
 name: kong
-summary: Secure, manage and extend your APIs and Microservices
+summary: Secure, manage and extend your APIs and Microservices.
 maintainer: Gregory Van Seghbroeck <gregory.vanseghbroeck@tengu.io>
 description: |
   The open-source API Gateway and Microservices Management Layer, 
