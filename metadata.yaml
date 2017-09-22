@@ -5,8 +5,6 @@ description: |
   The open-source API Gateway and Microservices Management Layer, 
   delivering high performance and reliability.
 tags:
-  # Replace "misc" with one or more whitelisted tags from this list:
-  # https://jujucharms.com/docs/stable/authors-charm-metadata
   - security
   - application_development
 subordinate: false
@@ -15,6 +13,8 @@ provides:
     interface: http
   proxy-endpoint:
     interface: http
+  apis:
+    interface: kong-api
 requires:
   cassandra:
     interface: cassandra
