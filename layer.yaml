@@ -1,7 +1,7 @@
-includes: ['layer:basic', 'interface:cassandra', 'interface:http']
+includes: ['layer:basic', 'layer:apt', 'interface:cassandra', 'interface:http', 'interface:kong-api']
 repo: git@github.com:tengu-team/layer-kong.git
 options:
-  basic:
+  apt:
     packages: 
       - openssl 
       - libpcre3

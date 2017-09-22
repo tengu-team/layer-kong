@@ -5,11 +5,13 @@ from charmhelpers.core.templating import render
 from charms.reactive import when, when_not, set_state, remove_state
 from charms import layer
 
+import requests
 import shutil
 import subprocess
 
 @when_not('cassandra.available')
 def cassandra_removed():
+    print('No connection executed.')
     remove_state('kong.connected')
     status_set('blocked', 'Waiting for a connection with Cassandra.')
 
@@ -26,7 +28,6 @@ def config_changed():
         changed = True
         close_port(db.get('admin_port'))
         db.set('admin_port', conf.get('admin_port'))
-    
     if changed:
         status_set('maintenance', '(Updating) Adjusting settings')
         context = {
@@ -43,13 +44,13 @@ def config_changed():
         subprocess.call(['kong', 'restart'])
         open_port(db.get('proxy_port'))
         open_port(db.get('admin_port'))
-        set_state('kong.started')
         status_set('active', '(Ready) Kong running.')
 
 
 @when('cassandra.available', 'kong.installed')
 @when_not('kong.connected')
 def cassandra_attached(cassandra):
+    print('Cassandra is connected.')
     status_set('maintenance', 'Configuring connection with Cassandra.')
     db = unitdata.kv()
     cass_cp = []
@@ -87,6 +88,7 @@ def cassandra_attached(cassandra):
 @when('apt.installed.openssl', 'apt.installed.libpcre3', 'apt.installed.procps', 'apt.installed.perl')
 @when_not('kong.installed', 'kong.started')
 def install_kong():
+    print('Installing kong.')
     options = layer.options()
     deb = options['kong']['kong_deb']
     status_set('maintenance', 'Installing Kong from {}.'.format(deb))
@@ -97,6 +99,7 @@ def install_kong():
 @when('kong.installed', 'kong.connected')
 @when_not('kong.started')
 def start_kong():
+    print('Starting kong.')
     conf = config()
     subprocess.call(['kong', 'migrations', 'up'])
     subprocess.call(['kong', 'start'])
@@ -104,6 +107,23 @@ def start_kong():
     open_port(conf.get('admin_port'))
     set_state('kong.started')
     status_set('active', '(Ready) Kong running.')
+
+@when('apis.available', 'kong.started')
+def add_apis(apis):
+    print('apis connected')
+    status_set('maintenance', 'Registering APIs.')
+    conf = config()
+    for api in apis.get_data():
+        url = 'http://localhost:{}/apis'.format(conf.get('admin_port'))
+        data = {
+            'name': api['service'],
+            'upstream_url': api['upstream_url'],
+            'hosts': api['hosts'],
+            'uris': api['uris'],
+            'methods': api['methods']
+        }
+        response = requests.post(url, data=data)
+        print(response.__dict__)
 
 @when('proxy-endpoint.available', 'kong.started')
 def configure_proxy_http(http):
@@ -119,7 +139,7 @@ def configure_proxy_http(http):
 def configure_admin_http(http):
     log('Client connected to the admin http endpoint.')
 
-    db = unitdata.kv() 
+    db = unitdata.kv()
     http.configure(
         hostname=unit_private_ip(),
         private_address=unit_private_ip(),
